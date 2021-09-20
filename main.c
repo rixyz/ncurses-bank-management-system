@@ -1,4 +1,6 @@
-
+#include <menu.h>
+#include <ncurses.h> /* ncurses.h includes stdio.h */
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -124,7 +126,7 @@ void menu() {
       menu_driver(my_menu, REQ_UP_ITEM);
       ch--;
       break;
-    case 10: 
+    case 10:
       unpost_menu(my_menu);
       for (i = 0; i < n_choices; ++i)
         free_item(my_items[i]);
@@ -159,7 +161,6 @@ void menu() {
       ch = 7;
     }
   }
-
 }
 
 void new_acc() {
@@ -197,7 +198,6 @@ account_no:
     }
   }
   add.acc_no = check.acc_no;
-  add.name="test";
   mvprintw(6, 2, "Enter the name:");
   scanw("%s", add.name);
   mvprintw(8, 2, "Enter the date of birth(mm/dd/yyyy):");
@@ -225,11 +225,10 @@ account_no:
 
   fclose(ptr);
   clear();
-  mvprintw(10, 3, "\nAccount created successfully!");
-  refresh();
-
-add_invalid:
   box(stdscr, 0, 0);
+  mvprintw(10, 3, "\n Account created successfully!");
+  refresh();
+add_invalid:
   mvprintw(LINES - 3, 2, "Enter y to main menu and n to exit:");
   exitcode = getch();
   if (exitcode == 'Y' || exitcode == 'y') {
@@ -557,16 +556,19 @@ void transact() {
 
             break;
           case 2:
-            mvprintw(LINES - 2, 2, "d");
             mvprintw(3, 2, "Enter the amount you want to withdraw:$ ");
             scanw("%f", &transaction.amt);
-            add.amt -= transaction.amt;
+            if (transaction.amt < add.amt) {
+              add.amt -= transaction.amt;
+              mvprintw(5, 2, "Withdrawn successfully!");
+            } else {
+              mvprintw(5, 2, "Not enough money to withdraw");
+            }
             fprintf(newrec, "%d %s %d/%d/%d %d %s %s %lf %s %f %d/%d/%d\n",
                     add.acc_no, add.name, add.dob.month, add.dob.day,
                     add.dob.year, add.age, add.address, add.citizenship,
                     add.phone, add.acc_type, add.amt, add.deposit.month,
                     add.deposit.day, add.deposit.year);
-            mvprintw(5, 2, "Withdrawn successfully!");
             break;
           case 3:
             transact();
